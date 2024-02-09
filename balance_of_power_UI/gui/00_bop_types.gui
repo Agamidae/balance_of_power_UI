@@ -1,0 +1,1093 @@
+
+types BOP {
+
+  type vbox_bop_main = vbox {
+    layoutpolicy_horizontal = expanding
+
+    vbox_balance_of_power = {
+      datacontext = "[GetPlayer]"
+    }
+
+    vbox = {
+      layoutpolicy_horizontal = expanding
+      # visible = "[Not(GetVariableSystem.Exists('balance_of_power'))]"
+
+      bop_expand_button = {
+        onclick = "[GetVariableSystem.Toggle('bop_pinned')]"
+
+        blockoverride "text" {
+          text = "bop_pinned_name"
+        }
+        blockoverride "frame" {
+          frame = "[Select_int32( GetVariableSystem.Exists('bop_pinned'), '(int32)2', '(int32)1')]"
+        }
+
+        button_replace = {
+          parentanchor = right|vcenter
+          position = { -10 0 }
+          onclick = "[GetScriptedGui('bop_pinned').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+          visible = "[GetVariableSystem.Exists('bop_pinned')]"
+          tooltip = "bop_refresh"
+        }
+      }
+
+      vbox = {
+        layoutpolicy_horizontal = expanding
+        visible = "[GetVariableSystem.Exists('bop_pinned')]"
+
+        vbox_balance_of_power = {
+          blockoverride "show_bop" {}
+          blockoverride "max_strength" {
+            visible = "[GetVariableSystem.Exists('balance_of_power')]"
+          }
+          blockoverride "extra" {
+            bop_expand_list = {
+              onclick = "[GetVariableSystem.Toggle('bop_pin_extra')]"
+              blockoverride "frame" {
+                frame = "[Select_int32( GetVariableSystem.Exists('bop_pin_extra'), '(int32)2', '(int32)1')]"
+              }
+              blockoverride "text" {
+                text = "bop_extra_name"
+              }
+            }
+          }
+          blockoverride "show_extra" {
+            visible = "[GetVariableSystem.Exists('bop_pin_extra')]"
+          }
+          blockoverride "expand" {
+            bop_expand_button = {
+              size = { 0 30 }
+              onclick = "[GetScriptedGui('bop_pin').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).AddScope('target', Character.MakeScope).End )]"
+
+              blockoverride "text" {
+                raw_text = "[Character.GetNameNoTooltip]"
+              }
+              blockoverride "frame" {
+                frame = 2
+              }
+            }
+          }
+          visible = "[GetPlayer.MakeScope.Var('bop_pin').IsSet]"
+          datacontext = "[GetPlayer.MakeScope.Var('bop_pin').GetCharacter]"
+        }
+
+        vbox = {
+          layoutpolicy_horizontal = expanding
+          datamodel = "[GetPlayer.MakeScope.GetList('bop_pinned')]"
+
+          item = {
+            bop_expand_button = {
+              size = { 0 30 }
+              datacontext = "[Scope.GetCharacter]"
+              visible = "[GetScriptedGui('bop_pin').IsShown( GuiScope.SetRoot( GetPlayer.MakeScope ).AddScope('target', Character.MakeScope).End )]"
+              onclick = "[GetScriptedGui('bop_pin').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).AddScope('target', Character.MakeScope).End )]"
+              onclick = "[GetScriptedGui('bop_pinned').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+
+              blockoverride "text" {
+                raw_text = "[Character.GetNameNoTooltip]"
+              }
+              blockoverride "frame" {
+                frame = 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  type vbox_bop_liege = vbox_balance_of_power {
+    datacontext = "[GetPlayer.GetLiege]"
+  }
+
+	type vbox_balance_of_power = vbox {
+		layoutpolicy_horizontal = expanding
+
+		block "expand" {
+			bop_expand_button = {
+				onclick = "[GetVariableSystem.Toggle('balance_of_power')]"
+
+				button_replace = {
+					parentanchor = right|vcenter
+					position = { -10 0 }
+					onclick = "[GetScriptedGui('bop_refresh').Execute( GuiScope.SetRoot( Character.MakeScope ).End )]"
+					visible = "[Not(GetVariableSystem.Exists('balance_of_power'))]"
+					shortcut = confirm
+					tooltip = "bop_refresh"
+				}
+			}
+		}
+
+
+		vbox = {
+			layoutpolicy_horizontal = expanding
+			spacing = 10
+			block "show_bop" {
+				visible = "[Not(GetVariableSystem.Exists('balance_of_power'))]"
+			}
+			margin = { 10 0 }
+			background = { using = Background_Area margin_top = 15}
+
+			vbox = {
+				layoutpolicy_horizontal = expanding
+				spacing = 5
+				margin_top = 10
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+
+					spacing = 5
+
+					icon = {
+						size = { 12 12 }
+						icon = {
+							size = { 100% 100% }
+							texture = "gfx/interface/colors/blue.dds"
+							icon = {
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/red.dds"
+								alpha = 0.15
+							}
+						}
+					}
+
+					text_single = {
+						align = nobaseline
+						text = "bop_you_number"
+						max_width = 150
+					}
+
+					expand = {}
+
+					text_single = {
+						text = "bop_total_vassals_name"
+						align = nobaseline
+						tooltip = "bop_vassals_tt"
+					}
+
+					expand = {}
+
+					flowcontainer = {
+						ignoreinvisible = yes
+						visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_revolting_vassals').GetValue, '(CFixedPoint)0')]"
+						spacing = 5
+
+						spacer = {
+							size = { 5 0 }
+						}
+
+						text_single = {
+							align = nobaseline
+							text = "bop_in_faction_name"
+						}
+
+						icon = {
+							parentanchor = vcenter
+							size = { 12 12 }
+
+							icon_in_faction = {}
+						}
+					}
+				}
+
+				spacer = {}
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					datacontext = "[Character]"
+
+					widget = {
+						size = { 0 14 }
+						layoutpolicy_horizontal = expanding
+						layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint(Character.MakeScope.ScriptValue('bop_your_max_or_current_strength'), '(CFixedPoint)1'))]"
+
+						icon = {
+							size = { 100% 100% }
+							texture = "gfx/interface/colors/blue.dds"
+							icon = {
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/red.dds"
+								alpha = 0.15
+							}
+						}
+
+						icon = {
+							parentanchor = right|vcenter
+							size = { 2 14 }
+							texture = "gfx/interface/colors/white.dds"
+						}
+					}
+
+					widget = {
+						layoutpolicy_horizontal = expanding
+						layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint(Character.MakeScope.Var('bop_total_vassals').GetValue, '(CFixedPoint)1'))]"
+
+						hbox = {
+							visible = no
+							layoutpolicy_horizontal = expanding
+
+							widget = {
+								size = { 0 14 }
+								layoutpolicy_horizontal = expanding
+								layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint(Character.MakeScope.Var('bop_loyal_vassals').GetValue, '(CFixedPoint)1'))]"
+
+								icon = {
+									size = { 100% 100% }
+									texture = "gfx/interface/colors/blue.dds"
+								}
+
+								bop_line = {}
+							}
+
+							widget = {
+								size = { 0 14 }
+								layoutpolicy_horizontal = expanding
+								layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint(Character.MakeScope.Var('bop_scared_vassals').GetValue, '(CFixedPoint)1'))]"
+
+								icon = {
+									size = { 100% 100% }
+									texture = "gfx/interface/colors/blue.dds"
+									icon = {
+										size = { 100% 100% }
+										texture = "gfx/interface/colors/white.dds"
+										alpha = 0.3
+									}
+								}
+								bop_line = {}
+							}
+
+							widget = {
+								size = { 0 14 }
+								layoutpolicy_horizontal = expanding
+								layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint( Character.MakeScope.Var('bop_undecided_vassals').GetValue, '(CFixedPoint)1'))]"
+
+								icon = {
+									size = { 100% 100% }
+									texture = "gfx/interface/colors/gold.dds"
+									tintcolor = { 1 1 0.5 1 }
+								}
+
+
+								bop_line = {}
+							}
+
+							widget = {
+								size = { 0 14 }
+								visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_revolting_vassals').GetValue, '(CFixedPoint)0')]"
+								layoutpolicy_horizontal = expanding
+								layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint( Character.MakeScope.Var('bop_revolting_vassals').GetValue, '(CFixedPoint)1'))]"
+
+								icon_in_faction = {}
+								bop_line = {}
+							}
+						}
+
+						vbox = {
+							expand = {}
+
+							vassal_balance_progressbar = {
+								blockoverride "size" {
+									size = { 0 14 }
+								}
+								blockoverride "line" {}
+								# blockoverride "shade_opinion" {}
+								datamodel = "[Character.MakeScope.GetList('bop_vassals_faction')]"
+								blockoverride "scared_vassal" {}
+							}
+						}
+					}
+				}
+
+				spacer = {}
+
+				hbox = {
+					layoutpolicy_horizontal = expanding
+					spacing = 15
+
+					hbox = {
+						spacing = 5
+						visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_loyal_vassals').GetValue, '(CFixedPoint)0')]"
+						icon = {
+							size = { 12 12 }
+							texture = "gfx/interface/colors/blue.dds"
+						}
+
+						text_single = {
+							align = nobaseline
+							text = "bop_cant_revolt"
+							max_width = 170
+						}
+					}
+
+					expand = {}
+
+					hbox = {
+						spacing = 5
+						visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_scared_vassals').GetValue, '(CFixedPoint)0')]"
+
+						icon = {
+							size = { 12 12 }
+							texture = "gfx/interface/colors/blue.dds"
+							icon = {
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/white.dds"
+								alpha = 0.25
+							}
+						}
+
+						text_single = {
+							align = nobaseline
+							text = "bop_scared_to_revolt"
+							max_width = 170
+							tooltip = "bop_intimidated_icon"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+					}
+
+					expand = {}
+
+					hbox = {
+						spacing = 5
+
+						text_single = {
+							align = nobaseline
+							raw_text = "bop_like"
+						}
+
+						hbox = {
+							visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_happy_undecided_vassals').GetValue, '(CFixedPoint)0')]"
+							spacing = 5
+							text_single = {
+								raw_text = "[BOPValue('bop_happy_undecided_vassals')]"
+								align = nobaseline
+							}
+							icon = {
+								size = { 12 12 }
+								texture = "gfx/interface/colors/green.dds"
+							}
+							tooltip = "bop_like"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+						spacer = {}
+
+						hbox = {
+							visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_angry_undecided_vassals').GetValue, '(CFixedPoint)0')]"
+							spacing = 5
+							text_single = {
+								align = nobaseline
+								raw_text = "bop_dislike"
+								# raw_text = "LOREM_IPSUM_TITLE"
+								# max_width = 120
+							}
+							text_single = {
+								raw_text = "[BOPValue('bop_angry_undecided_vassals')]"
+								# raw_text = "[Character.MakeScope.Var('bop_angry_undecided_vassals').GetValue|0]"
+								align = nobaseline
+							}
+							icon = {
+								size = { 12 12 }
+								texture = "gfx/interface/colors/gold.dds"
+								tintcolor = { 1 0.8 0.5 1 }
+							}
+							tooltip = "bop_dislike"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+					}
+
+					# expand = {}
+				}
+
+				vbox = {
+					layoutpolicy_horizontal = expanding
+					spacing = 5
+					visible = "[DataModelHasItems(Character.MakeScope.GetList('bop_vassals_faction'))]"
+					text_single = {
+						layoutpolicy_horizontal = expanding
+						text = "bop_vassals"
+						margin = { 0 5}
+					}
+
+					vbox = {
+						layoutpolicy_horizontal = expanding
+
+						vassal_balance_progressbar = {
+							visible = "[GetScriptedGui('bop_show_topbar').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							blockoverride "size" {
+								size = { 0 15 }
+							}
+							datamodel = "[Character.MakeScope.GetList('bop_vassals_faction')]"
+							blockoverride "opinion" {}
+							blockoverride "line" {}
+						}
+
+						vassal_balance_progressbar = {
+							datamodel = "[Character.MakeScope.GetList('bop_vassals_faction')]"
+							blockoverride "status" {}
+						}
+					}
+
+					spacer = {
+						size = { 0 0 }
+					}
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+						spacing = 10
+
+						text_single = {
+							raw_text = "bop_total"
+						}
+						text_single = {
+							raw_text = "@alliance_icon! [BOPValue('bop_allied_vassals')]"
+							tooltip = "bop_allied_icon"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+						text_single = {
+							raw_text = "@heart_icon! [BOPValue('bop_friendly_vassals')]"
+							tooltip = "bop_high_opinion_icon"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+						text_single = {
+							raw_text = "@intimidated_icon! [BOPValue('bop_intimidated_vassals')]"
+							tooltip = "bop_intimidated_icon"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+						text_single = {
+							raw_text = "@terrified_icon! [BOPValue('bop_terrified_vassals')]"
+							tooltip = "bop_terrified_icon"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+						expand = { }
+
+						text_single = {
+							raw_text = "[BOPValue('bop_happy_vassals')] @friend_icon!"
+							tooltip = "bop_like"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+						text_single = {
+							raw_text = "[BOPValue('bop_angry_vassals')] @rival_icon!"
+							tooltip = "bop_dislike"
+							using = tooltip_se
+							tooltip_offset = { 10 10 }
+						}
+
+
+						# text_single = {
+						# 	raw_text = "@faction_icon! [BOPValue('bop_revolting_vassals')]"
+						# }
+					}
+
+					spacer = {
+						size = { 0 5 }
+					}
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+						button_checkbox_label = {
+							block "max_strength" {}
+							onclick = "[GetScriptedGui('bop_max_strength').Execute( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							onclick = "[GetScriptedGui('bop_refresh').Execute( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							blockoverride "checkbox" {
+								checked = "[Character.MakeScope.Var('bop_max_strength').IsSet]"
+							}
+							blockoverride "text" {
+								text = "bop_use_max_strength"
+							}
+						}
+
+						expand = {}
+
+						block "extra" {
+							bop_expand_list = {
+								onclick = "[GetVariableSystem.Toggle('bop_extra')]"
+								blockoverride "frame" {
+									frame = "[Select_int32( GetVariableSystem.Exists('bop_extra'), '(int32)2', '(int32)1')]"
+								}
+								blockoverride "text" {
+									text = "bop_extra_name"
+								}
+							}
+						}
+
+					}
+				}
+
+
+				vbox = {
+					layoutpolicy_horizontal = expanding
+					block "show_extra" {
+						visible = "[GetVariableSystem.Exists('bop_extra')]"
+					}
+
+					divider_light = {
+						layoutpolicy_horizontal = expanding
+					}
+
+					spacing = 10
+
+					text_single = {
+						layoutpolicy_horizontal = expanding
+						text = "bop_strongest"
+					}
+
+					vbox = {
+						layoutpolicy_horizontal = expanding
+						vassal_balance_progressbar = {
+							visible = "[GetScriptedGui('bop_show_topbar').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							blockoverride "size" {
+								size = { 0 15 }
+							}
+							datamodel = "[Character.MakeScope.GetList('bop_vassals_strength')]"
+							blockoverride "opinion" {}
+							blockoverride "line" {}
+						}
+						vassal_balance_progressbar = {
+							datamodel = "[Character.MakeScope.GetList('bop_vassals_strength')]"
+							blockoverride "status" {}
+						}
+					}
+
+					text_single = {
+						layoutpolicy_horizontal = expanding
+						text = "bop_happiest"
+					}
+
+					vbox = {
+						layoutpolicy_horizontal = expanding
+						vassal_balance_progressbar = {
+							visible = "[GetScriptedGui('bop_show_topbar').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							blockoverride "size" {
+								size = { 0 15 }
+							}
+							datamodel = "[Character.MakeScope.GetList('bop_vassals_opinion')]"
+							blockoverride "opinion" {}
+							blockoverride "line" {}
+						}
+						vassal_balance_progressbar = {
+							datamodel = "[Character.MakeScope.GetList('bop_vassals_opinion')]"
+							blockoverride "status" {}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	type vassal_balance_progressbar = hbox {
+		layoutpolicy_horizontal = expanding
+		# spacing = -1
+		item = {
+			button = {
+				block "size" {
+					size = { 0 20 }
+				}
+				datacontext = "[Scope.GetCharacter]"
+
+				block "portrait_button_template_onmouseenter"
+				{
+					state = {
+						name = _mouse_enter
+						on_start = "[Character.OnMouseEnter]"
+					}
+				}
+				block "portrait_button_template_onmouseleave"
+				{
+					state = {
+						name = _mouse_leave
+						on_start = "[Character.OnMouseLeave]"
+					}
+				}
+
+				block "portrait_button_template_onclick"
+				{
+					onclick = "[DefaultOnCharacterClick(Character.GetID)]"
+				}
+
+				block "portrait_button_template_onrightclick"
+				{
+					onrightclick = "[DefaultOnCharacterRightClick(Character.GetID)]"
+					button_ignore = none
+				}
+
+				filter_mouse = right
+
+
+				layoutpolicy_horizontal = expanding
+				layoutstretchfactor_horizontal = "[FixedPointToInt(Multiply_CFixedPoint(Character.GetMaxMilitaryStrength, '(CFixedPoint)1'))]"
+
+				block "opinion" {
+					icon = {
+						size = { 100% 100% }
+						texture = "gfx/interface/colors/white.dds"
+						tintcolor = "[Character.GetOpinionOfTint( Character.GetLiege )]"
+						alpha = 1
+
+						icon = {
+							size = { 100% 100% }
+							visible = "[GreaterThan_int32( Character.GetOpinionOf( Character.GetLiege ), '(int32)79' )]"
+							texture = "gfx/interface/colors/white.dds"
+							alpha = 0.45
+						}
+
+						block "shade_opinion" {}
+					}
+				}
+
+				block "status" {
+					block "cant_join_factions" {
+						icon = {
+							size = { 100% 100% }
+							texture = "gfx/interface/colors/blue.dds"
+							visible = "[GetScriptedGui('cant_join_factions').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							block "darker" {}
+						}
+					}
+
+					block "scared_vassal" {
+						icon = {
+							size = { 100% 40% }
+							parentanchor = bottom
+							texture = "gfx/interface/colors/blue.dds"
+							visible = "[GetScriptedGui('scared_vassal').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							icon = {
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/white.dds"
+								alpha = 0.25
+							}
+
+							icon = {
+								visible = "[GetScriptedGui('terrified_vassal').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/white.dds"
+								alpha = 0.3
+							}
+						}
+					}
+
+					icon = {
+						size = { 100% 100% }
+						visible = "[Not(GetScriptedGui('cant_join_factions').IsShown( GuiScope.SetRoot( Character.MakeScope ).End ))]"
+						icon = {
+							size = { 100% 100% }
+							parentanchor = bottom
+							texture = "gfx/interface/colors/blue.dds"
+							visible = "[GetScriptedGui('scared_vassal').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							icon = {
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/white.dds"
+								alpha = 0.25
+							}
+
+							icon = {
+								visible = "[GetScriptedGui('terrified_vassal').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								size = { 100% 100% }
+								texture = "gfx/interface/colors/white.dds"
+								alpha = 0.5
+							}
+						}
+					}
+
+					block "is_a_faction_member" {
+						icon = {
+							size = { 100% 100% }
+							visible = "[GetScriptedGui('is_a_faction_member').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							icon_in_faction = {}
+						}
+					}
+				}
+
+				block "line" {
+					icon = {
+						size = { 1 100% }
+						texture = "gfx/interface/colors/black.dds"
+						parentanchor = right
+						alpha = 0.7
+					}
+				}
+
+				icon = {
+					texture = "gfx/interface/colors/white.dds"
+					alpha = 0.1
+					size = { 100% 100% }
+					visible = "[Or(Character.IsHovered, Character.IsSelected)]"
+				}
+
+
+				# background = {
+				# 	texture = "gfx/interface/colors/black.dds"
+				# 	margin = { 1 1 }
+				# }
+				tooltipwidget = {
+					container = {
+						using = DefaultTooltipBackground
+						alwaystransparent = no
+
+						flowcontainer = {
+							ignoreinvisible = yes
+							margin = { 20 20 }
+							direction = vertical
+							spacing = 10
+
+							flowcontainer = {
+								ignoreinvisible = yes
+								margin_right = 5
+								spacing = 5
+
+								portrait_head_small = {
+									blockoverride "opinion_text" {
+										text = "[Character.GetOpinionOf( Character.GetLiege )|=]"
+		                fonttintcolor = "[Character.GetOpinionOfTint( Character.GetLiege )]"
+									}
+									blockoverride "ott_heading_text"
+									{
+										raw_text = "@opinion_icon! [Character.GetOpinionHeadingText( Character.GetLiege )]"
+									}
+									blockoverride "ott_opinion_value_text"
+									{
+										text = "[Character.GetOpinionOf( Character.GetLiege )|=]"
+										fonttintcolor = "[Character.GetOpinionOfTint( Character.GetLiege )]"
+									}
+									blockoverride "ott_opinion_breakdown_text"
+									{
+										text = "[Character.GetOpinionBreakdownText( Character.GetLiege )]"
+									}
+								}
+
+								flowcontainer = {
+									ignoreinvisible = yes
+
+									direction = vertical
+									parentanchor = vcenter
+									spacing = 5
+
+									text_single = {
+										raw_text = "[Character.GetUINameNotMeNoTooltip]"
+										max_width = 400
+										multiline = yes
+									}
+
+									text_single = {
+										raw_text = "[Character.GetRelationToString( Character.GetLiege )]"
+										max_width = 400
+										multiline = yes
+									}
+
+									text_single = {
+										raw_text = "@soldier_icon! [Character.GetMaxMilitaryStrength|0v]"
+									}
+								}
+							}
+
+							divider_light = {
+								size = { 90% 3 }
+								parentanchor = hcenter
+								visible = "[GetScriptedGui('bop_in_faction').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							}
+
+							text_single = {
+								visible = "[GetScriptedGui('bop_in_faction').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								raw_text = "@faction_icon! #n In a faction!"
+							}
+
+							divider_light = {
+								size = { 90% 3 }
+								parentanchor = hcenter
+								visible = "[GetScriptedGui('cant_join_factions').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							}
+
+							# text_multi = {
+							# 	autoresize = yes
+							# 	raw_text = "[GetScriptedGui('can_join_faction_trigger').IsShownTooltip( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							# }
+
+							flowcontainer = {
+								margin = { 10 0 }
+								ignoreinvisible = yes
+								direction = vertical
+								visible = "[GetScriptedGui('cant_join_factions').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+
+								#TODO
+								# add bishop
+								# add at war
+
+
+								text_single = {
+									raw_text = "cant_join_factions_name"
+								}
+
+								text_single = {
+									raw_text = "bop_theocracy_name"
+									visible = "[GetScriptedGui('bop_theocracy').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+
+								text_single = {
+									raw_text = "bop_blocked_name"
+									visible = "[GetScriptedGui('bop_blocked').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+
+								text_single = {
+									raw_text = "bop_under_watch_name"
+									visible = "[GetScriptedGui('bop_under_watch').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+
+								text_single = {
+									raw_text = "bop_allied_name"
+									visible = "[GetScriptedGui('bop_allied').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_truce_name"
+									visible = "[GetScriptedGui('bop_truce').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_hook_name"
+									visible = "[GetScriptedGui('bop_hook').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_imprisoned_name"
+									visible = "[GetScriptedGui('bop_imprisoned').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_is_friend_name"
+									visible = "[GetScriptedGui('bop_is_friend').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_is_lover_name"
+									visible = "[GetScriptedGui('bop_is_lover').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_high_opinion_name"
+									visible = "[GetScriptedGui('bop_high_opinion').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_underage_name"
+									visible = "[GetScriptedGui('bop_underage').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_incapable_name"
+									visible = "[GetScriptedGui('bop_incapable').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+								text_single = {
+									raw_text = "bop_terrified_name"
+									visible = "[GetScriptedGui('bop_terrified').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								}
+							}
+
+							divider_light = {
+								size = { 90% 3 }
+								parentanchor = hcenter
+								visible = "[GetScriptedGui('bop_intimidated').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+							}
+
+							flowcontainer = {
+								margin = { 10 0 }
+								margin_bottom = 5
+								ignoreinvisible = yes
+								visible = "[GetScriptedGui('bop_intimidated').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+								spacing = 3
+
+								text_single = {
+									raw_text = "bop_is"
+								}
+
+								text_single = {
+									visible = "[GetScriptedGui('cant_join_factions').IsShown( GuiScope.SetRoot( Character.MakeScope ).End )]"
+									raw_text = "bop_also"
+								}
+
+
+								text_single = {
+									raw_text = "bop_intimidated_name"
+								}
+							}
+
+							bop_expand_button = {
+								shortcut = map_mode_1
+								size = { 90% 30 }
+								onclick = "[GetVariableSystem.Toggle('bop_opinion')]"
+								blockoverride "text" {
+									raw_text = "bop_opinion_breakdown"
+								}
+								blockoverride "frame" {
+									frame = "[Select_int32( GetVariableSystem.Exists('bop_opinion'), '(int32)2', '(int32)1')]"
+								}
+							}
+
+							flowcontainer = {
+								margin_top = -15
+								visible = "[GetVariableSystem.Exists('bop_opinion')]"
+								ignoreinvisible = yes
+								blockoverride "bg_texture" {
+									visible = no
+								}
+								blockoverride "frame_color" {
+									visible = no
+								}
+								blockoverride "progress" {
+									visible = no
+								}
+								using = character_opinion_tooltip
+								blockoverride "ott_heading_text"
+								{
+									raw_text = "bop_opinion_tt"
+								}
+								blockoverride "ott_opinion_value_text"
+								{
+									text = "[Character.GetOpinionOf( Character.GetLiege )|=]"
+									fonttintcolor = "[Character.GetOpinionOfTint( Character.GetLiege )]"
+								}
+								blockoverride "ott_opinion_breakdown_text"
+								{
+									text = "[Character.GetOpinionBreakdownText( Character.GetLiege )]"
+								}
+							}
+						}
+					}
+				}
+				using = tooltip_se
+				tooltip_offset = { -20 5 }
+				# moved left a little to make it easier to move the mouse to a locked tooltip
+			}
+		}
+	}
+
+	type bop_expand_list = button {
+		size = { 150 30 }
+
+		flowcontainer = {
+			ignoreinvisible = yes
+			parentanchor = right
+
+			text_label_right = {
+				parentanchor = vcenter
+				default_format = "#clickable"
+				margin_right = 10
+				margin_left = 100
+				block "text" {
+					raw_text = "bop_extra_name"
+				}
+			}
+
+			button_expand = {
+				parentanchor = vcenter
+				mirror = horizontal
+				size = { 22 22 }
+				position = { 5 0 }
+				alwaystransparent = yes
+				block "frame" {
+					frame = "[Select_int32( GetVariableSystem.Exists('balance_of_power'), '(int32)1', '(int32)2')]"
+				}
+			}
+		}
+	}
+
+	type bop_expand_button = button {
+		layoutpolicy_horizontal = expanding
+		size = { 0 40 }
+
+		button = {
+			using = Background_Area_Solid
+			alpha = 0.9
+			size = { 100% 100% }
+			alwaystransparent = yes
+		}
+
+		button_expand = {
+			parentanchor = vcenter
+			size = { 22 22 }
+			position = { 10 0 }
+			alwaystransparent = yes
+			block "frame" {
+				frame = "[Select_int32( GetVariableSystem.Exists('balance_of_power'), '(int32)1', '(int32)2')]"
+			}
+		}
+
+		hbox = {
+			layoutpolicy_horizontal = expanding
+			spacing = 10
+
+			text_single = {
+				name = "category"
+				layoutpolicy_horizontal = expanding
+				align = nobaseline|center
+				default_format = "#clickable"
+				block "text" {
+					raw_text = "balance_of_power_name"
+					using = Font_Size_Medium
+				}
+			}
+		}
+	}
+
+	type icon_in_faction = icon {
+		size = { 100% 100% }
+		icon = {
+			size = { 100% 100% }
+			texture = "gfx/interface/colors/red.dds"
+			alpha = 1
+		}
+
+		icon = {
+			size = { 100% 100% }
+			texture = "gfx/interface/colors/black.dds"
+			alpha = 0.45
+		}
+	}
+
+	type bop_line = icon {
+		parentanchor = right
+		size = { 1 100% }
+		texture = "gfx/interface/colors/black.dds"
+	}
+
+  type bop_vassal_strength = text_label_center {
+    parentanchor = hcenter
+    background = { using = Background_Area }
+    raw_text = "@soldier_icon! [Character.GetMilitaryStrengthText]"
+    tooltip = "[Character.GetMilitaryStrengthTooltip]"
+  }
+}
+
+template bop_states {
+  state = {
+    name = me_bop
+    trigger_when = "[GetVariableSystem.HasValue( 'factions_view_tabs', 'against_you' )]"
+    on_finish = "[GetScriptedGui('bop_refresh').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+  }
+
+  state = {
+    name = pinned_bop
+    trigger_when = "[GetVariableSystem.Exists( 'bop_pinned' )]"
+    on_finish = "[GetScriptedGui('bop_pinned').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+  }
+
+  state = {
+    name = liege_bop
+    trigger_when = "[GetVariableSystem.HasValue( 'factions_view_tabs', 'against_liege' )]"
+    on_finish = "[GetScriptedGui('bop_refresh').Execute( GuiScope.SetRoot( GetPlayer.GetLiege.MakeScope ).End )]"
+  }
+}
+
+
+template bop_show {
+  on_finish = "[GetScriptedGui('bop_refresh').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+  on_finish = "[GetScriptedGui('bop_pinned').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+}
+
+template bop_hide {
+  on_finish = "[GetScriptedGui('bop_cleanup').Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).End )]"
+  on_finish = "[GetScriptedGui('bop_cleanup').Execute( GuiScope.SetRoot( GetPlayer.GetLiege.MakeScope ).End )]"
+}
