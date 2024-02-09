@@ -1,0 +1,4 @@
+﻿macro = {
+	definition = "BOPValue(VALUE)"
+	replace_with = "SelectLocalization(GreaterThan_CFixedPoint(Character.MakeScope.Var(VALUE).GetValue, '(CFixedPoint)10000'), Concatenate(VALUE, '_k'), VALUE)"
+}

@@ -1,0 +1,219 @@
+﻿bop_opinion_and_faction = {
+	value = var:bop_opinion_of_liege
+
+	if = {
+		limit = {
+			bop_vassals_cant_join_factions = yes
+		}
+		add = 1000
+	}
+	if = {
+		limit = {
+			var:bop_opinion_of_liege >= 80
+		}
+		add = 500
+	}
+	if = {
+		limit = {
+			has_dread_level_towards = {
+				target = liege
+				level > 1
+			}
+		}
+		add = 500
+	}
+	else = {
+		if = {
+			limit = {
+				has_dread_level_towards = {
+					target = liege
+					level = 1
+				}
+			}
+			add = 200
+		}
+	}
+	if = {
+		limit = {
+			is_a_faction_member = yes
+		}
+		subtract = 1000
+	}
+}
+
+bop_total_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_loyal_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    limit = {
+      bop_vassals_cant_join_factions = yes
+    }
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_intimidated_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    limit = {
+      has_dread_level_towards = {
+        target = liege
+        level = 1
+      }
+    }
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_terrified_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    limit = {
+      has_dread_level_towards = {
+        target = liege
+        level > 1
+      }
+    }
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_scared_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    limit = {
+      has_dread_level_towards = {
+        target = liege
+        level > 0
+      }
+      bop_vassals_cant_join_factions = no
+    }
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_friendly_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    limit = {
+      var:bop_opinion_of_liege >= 80
+    }
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_undecided_vassals = {
+	every_in_list = {
+		variable = bop_vassals_faction
+		limit = {
+			bop_vassals_cant_join_factions = no
+			is_a_faction_member = no
+			NOT = {
+				has_dread_level_towards = {
+					target = liege
+					level > 0
+				}
+			}
+		}
+		add = bop_vassal_max_or_current_strength
+	}
+}
+
+bop_revolting_vassals = {
+	every_in_list = {
+		variable = bop_vassals_faction
+		limit = {
+			is_a_faction_member = yes
+		}
+		add = bop_vassal_max_or_current_strength
+	}
+}
+
+bop_happy_vassals = {
+  every_in_list = {
+		variable = bop_vassals_faction
+    limit = {
+      var:bop_opinion_of_liege > 0
+    }
+    add = bop_vassal_max_or_current_strength
+  }
+}
+
+bop_angry_vassals = {
+	every_in_list = {
+		variable = bop_vassals_faction
+		limit = {
+			var:bop_opinion_of_liege <= 0
+		}
+		add = bop_vassal_max_or_current_strength
+	}
+}
+
+bop_angry_undecided_vassals = {
+	every_in_list = {
+		variable = bop_undecided
+		limit = {
+			var:bop_opinion_of_liege <= 0
+		}
+		add = bop_vassal_max_or_current_strength
+	}
+}
+
+bop_happy_undecided_vassals = {
+	every_in_list = {
+		variable = bop_undecided
+		limit = {
+			var:bop_opinion_of_liege > 0
+		}
+		add = bop_vassal_max_or_current_strength
+	}
+}
+
+bop_allied_vassals = {
+	every_in_list = {
+		variable = bop_vassals_faction
+		limit = {
+			is_allied_to = liege
+		}
+		add = bop_vassal_max_or_current_strength
+	}
+}
+
+bop_your_current_strength = {
+	value = current_military_strength
+}
+
+bop_your_max_or_current_strength = {
+	if = {
+		limit = {
+			has_variable = bop_max_strength
+		}
+		value = max_military_strength
+	}
+	else = {
+		value = current_military_strength
+	}
+}
+
+bop_vassal_max_or_current_strength = {
+	if = {
+		limit = {
+			liege = {
+				has_variable = bop_max_strength
+			}
+		}
+		value = max_military_strength
+	}
+	else = {
+		value = current_military_strength
+	}
+	divide = 10
+	round = yes
+	multiply = 10
+}

@@ -1,0 +1,8 @@
+﻿bop_vassals_cant_join_factions = {
+  liege = {
+    is_target_in_variable_list = {
+      name = bop_vassals_cant_join_factions
+      target = prev
+    }
+  }
+}

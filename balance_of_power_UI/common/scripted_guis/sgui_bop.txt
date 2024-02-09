@@ -1,0 +1,276 @@
+﻿bop_refresh = {
+  effect = {
+    bop_refresh_effect = yes
+  }
+}
+
+bop_pinned = {
+  effect = {
+    clear_variable_list = bop_pinned
+    every_pinned_character = {
+      limit = {
+        is_ruler = yes
+        is_landed = yes
+        max_military_strength > 0
+      }
+
+      root = {
+        add_to_variable_list = {
+          name = bop_pinned
+          target = prev
+        }
+      }
+    }
+    if = {
+      limit = {
+        has_variable = bop_pin
+      }
+      var:bop_pin = {
+        bop_refresh_effect = yes
+      }
+    }
+  }
+}
+
+bop_pin = {
+  effect = {
+    if = {
+      limit = {
+        var:bop_pin ?= scope:target
+      }
+      remove_variable = bop_pin
+    }
+    else = {
+      set_variable = {
+        name = bop_pin
+        value = scope:target
+      }
+    }
+  }
+  is_shown = {
+    trigger_if = {
+      limit = {
+        has_variable = bop_pin
+      }
+      var:bop_pin != scope:target
+    }
+  }
+}
+
+bop_show_topbar = {
+  is_shown = {
+    OR = {
+      AND = {
+        exists = var:bop_loyal_vassals
+        var:bop_loyal_vassals > 0
+      }
+      AND = {
+        exists = var:bop_scared_vassals
+        var:bop_scared_vassals > 0
+      }
+      AND = {
+        exists = var:bop_revolting_vassals
+        var:bop_revolting_vassals > 0
+      }
+    }
+  }
+}
+
+cant_join_factions = {
+  is_shown = {
+    bop_vassals_cant_join_factions = yes
+  }
+}
+
+is_a_faction_member = {
+	is_shown = {
+		is_a_faction_member = yes
+	}
+}
+
+is_a_faction_leader = {
+	is_shown = {
+		is_a_faction_leader = yes
+	}
+}
+
+terrified_vassal = {
+  is_shown = {
+    # bop_vassals_cant_join_factions = no
+    has_dread_level_towards = {
+			target = liege
+			level > 1
+		}
+  }
+}
+
+scared_vassal = {
+	is_shown = {
+		# bop_vassals_cant_join_factions = no
+		has_dread_level_towards = {
+			target = liege
+			level > 0
+		}
+	}
+}
+
+bop_allied = {
+  is_shown = {
+    is_allied_to = liege
+  }
+}
+
+bop_truce = {
+  is_shown = {
+    has_truce = liege
+  }
+}
+
+bop_hook = {
+  is_shown = {
+    liege = {
+      has_strong_hook = root
+    }
+  }
+}
+
+bop_blocked = {
+  is_shown = {
+    has_character_flag = joining_faction_block
+  }
+}
+
+bop_under_watch = {
+  is_shown = {
+    has_character_modifier = yearly_close_watch_modifier
+  }
+}
+
+bop_theocracy = {
+  is_shown = {
+    OR = {
+      government_has_flag = government_is_theocracy
+      trigger_if = {
+        limit = { exists = cp:councillor_court_chaplain }
+        this = cp:councillor_court_chaplain
+      }
+    }
+  }
+}
+
+bop_terrified = {
+  is_shown = {
+    has_dread_level_towards = {
+      target = liege
+      level > 1
+    }
+  }
+}
+
+bop_imprisoned = {
+  is_shown = {
+    is_imprisoned = yes
+  }
+}
+
+bop_is_friend = {
+  is_shown = {
+    has_relation_friend = liege
+  }
+}
+
+bop_is_lover = {
+  is_shown = {
+    has_relation_lover = liege
+  }
+}
+
+bop_high_opinion = {
+  is_shown = {
+    var:bop_opinion_of_liege >= 80
+  }
+}
+
+bop_underage = {
+  is_shown = {
+    is_adult = no
+  }
+}
+
+bop_incapable = {
+  is_shown = {
+    has_trait = incapable
+  }
+}
+
+bop_intimidated = {
+  is_shown = {
+    has_dread_level_towards = {
+      target = liege
+      level = 1
+    }
+  }
+}
+
+bop_max_strength = {
+  effect = {
+    if = {
+      limit = {
+        has_variable = bop_max_strength
+      }
+      remove_variable = bop_max_strength
+    }
+    else = {
+      set_variable = bop_max_strength
+    }
+  }
+}
+
+can_join_faction_trigger = {
+  is_shown = {
+    common_can_character_join_trigger = {
+      FACTION_TARGET = liege
+    }
+  }
+}
+
+bop_in_faction = {
+  is_shown = {
+    is_a_faction_member = yes
+  }
+}
+
+bop_cleanup = {
+  effect = {
+    # add_to_list = bop_list
+    every_pinned_character = {
+      limit = {
+        has_variable_list = bop_vassals_faction
+      }
+      add_to_list = bop_list
+    }
+    every_in_list = {
+      list = bop_list
+
+      clear_variable_list = bop_vassals_faction
+      clear_variable_list = bop_vassals_opinion
+      clear_variable_list = bop_vassals_strength
+      clear_variable_list = bop_vassals_cant_join_factions
+      clear_variable_list = bop_undecided
+      remove_variable = bop_loyal_vassals
+      remove_variable = bop_scared_vassals
+      remove_variable = bop_friendly_vassals
+      remove_variable = bop_undecided_vassals
+      remove_variable = bop_angry_vassals
+      remove_variable = bop_happy_vassals
+      remove_variable = bop_revolting_vassals
+      remove_variable = bop_revolting_undecided_vassals
+      remove_variable = bop_total_vassals
+      remove_variable = bop_intimidated_vassals
+      remove_variable = bop_terrified_vassals
+      remove_variable = bop_allied_vassals
+      remove_variable = bop_angry_undecided_vassals
+      remove_variable = bop_happy_undecided_vassals
+    }
+  }
+}

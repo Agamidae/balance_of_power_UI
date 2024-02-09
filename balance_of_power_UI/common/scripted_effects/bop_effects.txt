@@ -1,0 +1,203 @@
+﻿bop_refresh_effect = {
+	clear_variable_list = bop_vassals_faction
+	clear_variable_list = bop_vassals_opinion
+	clear_variable_list = bop_vassals_strength
+	clear_variable_list = bop_vassals_cant_join_factions
+	clear_variable_list = bop_undecided
+
+	every_vassal = {
+		limit = {
+			bop_vassal_max_or_current_strength > 0
+			highest_held_title_tier > tier_barony
+		}
+		save_temporary_opinion_value_as = {
+			name = opinion_of_liege
+			target = liege
+		}
+		set_variable = {
+			name = bop_opinion_of_liege
+			value = scope:opinion_of_liege
+		}
+
+		if = {
+			limit = {
+				OR = {
+					# is_adult = no
+					# has_truce = root
+					# has_trait = incapable
+					# root = {
+					#   has_strong_hook = prev
+					# }
+					# is_allied_to = root
+					# has_relation_friend = root
+					# has_relation_lover = root
+					# # not a theocracy, doesn't have a blocking flag
+					# NOT = {
+					#   common_character_validity_trigger = {
+					#     FACTION_TARGET = root
+					#   }
+					# }
+					# character_has_faction_disabling_modifier_trigger = no
+
+					NOT = {
+						common_can_character_join_trigger = {
+							FACTION_TARGET = liege
+						}
+					}
+					# most factions use common_faction_modifiers and common_join_faction_blockers
+					# that's where opinion and dread are from, they add -1000
+					var:bop_opinion_of_liege >= 80
+					has_dread_level_towards = {
+						target = liege
+						level > 1
+					}
+					is_imprisoned = yes
+				}
+			}
+			liege = {
+				add_to_variable_list = {
+					name = bop_vassals_cant_join_factions
+					target = prev
+				}
+			}
+		}
+
+		add_to_list = bop_vassals_temp
+	}
+
+	ordered_in_list = {
+		list = bop_vassals_temp
+		order_by = bop_opinion_and_faction
+		min = 0
+
+		liege = {
+			add_to_variable_list = {
+				name = bop_vassals_faction
+				target = prev
+			}
+		}
+	}
+
+	ordered_in_list = {
+		list = bop_vassals_temp
+		order_by = bop_opinion_and_faction
+		min = 0
+		limit = {
+			bop_vassals_cant_join_factions = no
+			is_a_faction_member = no
+			NOT = {
+				has_dread_level_towards = {
+					target = liege
+					level > 0
+				}
+			}
+		}
+
+		liege = {
+			add_to_variable_list = {
+				name = bop_undecided
+				target = prev
+			}
+		}
+	}
+
+	ordered_in_list = {
+		list = bop_vassals_temp
+		order_by = var:bop_opinion_of_liege
+		min = 0
+
+		liege = {
+			add_to_variable_list = {
+				name = bop_vassals_opinion
+				target = prev
+			}
+		}
+	}
+
+	ordered_in_list = {
+		list = bop_vassals_temp
+		order_by = current_military_strength
+		min = 0
+
+		liege = {
+			add_to_variable_list = {
+				name = bop_vassals_strength
+				target = prev
+			}
+		}
+	}
+
+	# this is for better performance, so we're not going through all vassals 10 times every frame
+	set_variable = {
+	  name = bop_total_vassals
+	  value = bop_total_vassals
+	}
+
+	set_variable = {
+	  name = bop_allied_vassals
+	  value = bop_allied_vassals
+	}
+
+	set_variable = {
+	  name = bop_loyal_vassals
+	  value = bop_loyal_vassals
+	}
+
+	set_variable = {
+	  name = bop_angry_undecided_vassals
+	  value = bop_angry_undecided_vassals
+	}
+
+	set_variable = {
+	  name = bop_happy_undecided_vassals
+	  value = bop_happy_undecided_vassals
+	}
+
+	set_variable = {
+	  name = bop_scared_vassals
+	  value = bop_scared_vassals
+	}
+
+	set_variable = {
+	  name = bop_intimidated_vassals
+	  value = bop_intimidated_vassals
+	}
+
+	set_variable = {
+	  name = bop_terrified_vassals
+	  value = bop_terrified_vassals
+	}
+
+	set_variable = {
+	  name = bop_friendly_vassals
+	  value = bop_friendly_vassals
+	}
+
+	set_variable = {
+	  name = bop_undecided_vassals
+	  value = bop_undecided_vassals
+	}
+
+	set_variable = {
+	  name = bop_angry_vassals
+	  value = bop_angry_vassals
+	}
+
+	set_variable = {
+	  name = bop_happy_vassals
+	  value = bop_happy_vassals
+	}
+
+	set_variable = {
+	  name = bop_revolting_vassals
+	  value = bop_revolting_vassals
+	}
+
+	set_variable = {
+	  name = bop_revolting_undecided_vassals
+	  value = {
+	    value = var:bop_undecided_vassals
+	    add = var:bop_revolting_vassals
+	  }
+	}
+}
