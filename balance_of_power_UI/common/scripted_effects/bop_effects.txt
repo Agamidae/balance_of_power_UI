@@ -46,6 +46,12 @@
 					}
 					# most factions use common_faction_modifiers and common_join_faction_blockers
 					# that's where opinion and dread are from, they add -1000
+					OR = {
+			      liege = {
+			        is_allied_to = prev
+			      }
+			      is_allied_to = liege
+			    }
 					var:bop_opinion_of_liege >= 80
 					has_dread_level_towards = {
 						target = liege

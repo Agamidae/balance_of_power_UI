@@ -350,14 +350,14 @@ types BOP {
 					hbox = {
 						spacing = 5
 
-						text_single = {
-							align = nobaseline
-							raw_text = "bop_like"
-						}
 
 						hbox = {
 							visible = "[GreaterThan_CFixedPoint(Character.MakeScope.Var('bop_happy_undecided_vassals').GetValue, '(CFixedPoint)0')]"
 							spacing = 5
+              text_single = {
+                align = nobaseline
+                raw_text = "bop_like"
+              }
 							text_single = {
 								raw_text = "[BOPValue('bop_happy_undecided_vassals')]"
 								align = nobaseline

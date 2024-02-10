@@ -116,7 +116,12 @@ scared_vassal = {
 
 bop_allied = {
   is_shown = {
-    is_allied_to = liege
+    OR = {
+      liege = {
+        is_allied_to = prev
+      }
+      is_allied_to = liege
+    }
   }
 }
 
